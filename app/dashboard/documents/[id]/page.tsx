@@ -84,6 +84,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
   const [cancelling, setCancelling] = useState(false)
   const [resending, setResending] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
+  const [regenerating, setRegenerating] = useState(false)
 
   function copyLink(token: string) {
     const url = `${window.location.origin}/sign/${token}/review`
@@ -121,6 +122,17 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     })
     setResending(null)
     alert('Convite reenviado com sucesso!')
+  }
+
+  async function handleRegeneratePdf() {
+    setRegenerating(true)
+    await fetch(`/api/documents/${params.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'regenerate-pdf' }),
+    })
+    setRegenerating(false)
+    window.location.reload()
   }
 
   if (loading) return (
@@ -169,6 +181,13 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                 <Download className="w-4 h-4" />
                 Baixar assinado
               </a>
+            )}
+            {doc.status === 'COMPLETED' && !doc.signedUrl && (
+              <button onClick={handleRegeneratePdf} disabled={regenerating}
+                className="flex items-center gap-1.5 bg-orange-500 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-orange-600 transition-colors disabled:opacity-60">
+                <Download className="w-4 h-4" />
+                {regenerating ? 'Gerando...' : 'Gerar PDF assinado'}
+              </button>
             )}
             {!['COMPLETED', 'CANCELLED', 'EXPIRED'].includes(doc.status) && (
               <button onClick={handleCancel} disabled={cancelling}

@@ -5,6 +5,8 @@ import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { createAuditLog, getClientIp, getClientAgent } from '@/lib/audit-log'
 import { sendSignInvite } from '@/lib/email'
+import { embedSignaturesInPDF } from '@/lib/pdf'
+import { hashFile } from '@/lib/crypto'
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession()
@@ -55,6 +57,46 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       documentId: doc.id, action: 'invite_resent',
       actorEmail: session.user.email, actorIp: getClientIp(req), actorAgent: getClientAgent(req),
       metadata: { signerEmail: signer.email },
+    })
+    return NextResponse.json({ ok: true })
+  }
+
+  if (action === 'regenerate-pdf') {
+    const fullDoc = await prisma.document.findFirst({
+      where: { id: params.id, ownerId: user?.id },
+      include: { signers: true },
+    })
+    if (!fullDoc || fullDoc.status !== 'COMPLETED') {
+      return NextResponse.json({ error: 'Documento não concluído.' }, { status: 400 })
+    }
+    const signedSigners = fullDoc.signers.filter(s => s.status === 'SIGNED')
+    let pdfBuffer: Buffer
+    if (fullDoc.fileUrl.startsWith('data:')) {
+      const base64 = fullDoc.fileUrl.split(',')[1]
+      pdfBuffer = Buffer.from(base64, 'base64')
+    } else {
+      const pdfResponse = await fetch(fullDoc.fileUrl)
+      pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer())
+    }
+    const signedPdfBytes = await embedSignaturesInPDF(
+      pdfBuffer,
+      fullDoc.id,
+      fullDoc.fileHash,
+      signedSigners.map(s => ({
+        name: s.name,
+        email: s.email,
+        cpf: s.cpf,
+        signedAt: s.signedAt!,
+        ipAddress: s.ipAddress,
+        authMethod: s.authMethod,
+        signatureImg: s.signatureImg,
+      }))
+    )
+    const signedHash = await hashFile(Buffer.from(signedPdfBytes))
+    const signedUrl = `data:application/pdf;base64,${Buffer.from(signedPdfBytes).toString('base64')}`
+    await prisma.document.update({
+      where: { id: fullDoc.id },
+      data: { signedUrl, signedHash },
     })
     return NextResponse.json({ ok: true })
   }
