@@ -23,7 +23,7 @@ export function SignatureProgress({ steps, companyName = 'AssinarBR' }: Props) {
   return (
     <aside
       className={clsx(
-        'flex-shrink-0 bg-[#FFF0EB] flex flex-col transition-all duration-300 min-h-screen',
+        'flex-shrink-0 bg-[#D8D9E0] flex flex-col transition-all duration-300 min-h-screen',
         collapsed ? 'w-14' : 'w-[270px]'
       )}
     >
