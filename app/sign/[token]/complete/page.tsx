@@ -77,11 +77,9 @@ export default function CompletePage({ params }: { params: { token: string } }) 
       </div>
 
       <div className="space-y-3">
-        {signer?.document.signedUrl && (
+        {signer?.document.id && (
           <a
-            href={signer.document.signedUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/api/sign/${params.token}/download`}
             className="flex items-center justify-center gap-2 bg-orange-500 text-white rounded-full px-8 py-3 w-full font-semibold hover:bg-orange-600 transition-colors"
           >
             <Download className="w-4 h-4" />
