@@ -90,15 +90,6 @@ export function SignatureProgress({ steps, companyName = 'AssinarBR' }: Props) {
         </div>
       )}
 
-      {/* Badge seguro */}
-      {!collapsed && (
-        <div className="px-4 pb-5">
-          <div className="bg-white/60 rounded-lg px-3 py-2 flex items-center gap-2">
-            <span className="text-green-600 text-sm">🔒</span>
-            <span className="text-xs text-gray-500 font-medium">Ambiente seguro</span>
-          </div>
-        </div>
-      )}
     </aside>
   )
 }
