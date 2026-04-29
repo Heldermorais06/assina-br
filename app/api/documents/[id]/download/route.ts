@@ -30,20 +30,26 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 
   const signedSigners = doc.signers.filter(s => s.status === 'SIGNED')
 
-  const signedPdfBytes = await embedSignaturesInPDF(
-    originalBuffer,
-    doc.id,
-    doc.fileHash,
-    signedSigners.map(s => ({
-      name: s.name,
-      email: s.email,
-      cpf: s.cpf,
-      signedAt: s.signedAt!,
-      ipAddress: s.ipAddress,
-      authMethod: s.authMethod,
-      signatureImg: s.signatureImg,
-    }))
-  )
+  let signedPdfBytes: Uint8Array
+  try {
+    signedPdfBytes = await embedSignaturesInPDF(
+      originalBuffer,
+      doc.id,
+      doc.fileHash,
+      signedSigners.map(s => ({
+        name: s.name,
+        email: s.email,
+        cpf: s.cpf,
+        signedAt: s.signedAt ? new Date(s.signedAt) : new Date(),
+        ipAddress: s.ipAddress,
+        authMethod: s.authMethod,
+        signatureImg: s.signatureImg,
+      }))
+    )
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: 'Erro ao gerar PDF', detail: msg }, { status: 500 })
+  }
 
   const fileName = doc.fileName.replace(/\.pdf$/i, '') + '-assinado.pdf'
 
