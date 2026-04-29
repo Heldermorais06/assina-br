@@ -30,18 +30,20 @@ export function SignatureProgress({ steps, companyName = 'AssinarBR' }: Props) {
       {/* Header com logo */}
       <div className="bg-[#1a1208] px-4 py-4 flex items-center justify-between">
         {!collapsed && (
-          <Image
-            src="/logo-helder-morais.png"
-            alt="Helder Morais"
-            width={150}
-            height={56}
-            className="object-contain"
-            priority
-          />
+          <div className="flex-1 flex justify-center">
+            <Image
+              src="/logo-helder-morais.png"
+              alt="Helder Morais"
+              width={150}
+              height={56}
+              className="object-contain"
+              priority
+            />
+          </div>
         )}
         <button
           onClick={() => setCollapsed(v => !v)}
-          className="text-[#c9a96e]/70 hover:text-[#c9a96e] text-xs font-medium whitespace-nowrap ml-auto"
+          className="text-[#c9a96e]/70 hover:text-[#c9a96e] text-xs font-medium whitespace-nowrap"
           title={collapsed ? 'Expandir' : 'Colapsar'}
         >
           {collapsed ? '›' : '‹'}

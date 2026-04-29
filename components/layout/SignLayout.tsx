@@ -57,10 +57,7 @@ export function SignLayout({ steps, children, companyName, showBack = true, back
             <a href="/termos" className="text-orange-500 hover:underline">Termos de Uso</a>
             <a href="/privacidade" className="text-orange-500 hover:underline">Política de Privacidade</a>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">🔒 Ambiente seguro</span>
-            <Image src="/logo-helder-morais.png" alt="Helder Morais" width={70} height={26} className="object-contain opacity-60" />
-          </div>
+          <span className="text-xs text-gray-400">🔒 Ambiente seguro</span>
         </div>
       </div>
     </div>
