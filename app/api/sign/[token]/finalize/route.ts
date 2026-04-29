@@ -76,8 +76,14 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
   if (allSigned) {
     // Gerar PDF assinado
     try {
-      const pdfResponse = await fetch(updatedDoc.fileUrl)
-      const pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer())
+      let pdfBuffer: Buffer
+      if (updatedDoc.fileUrl.startsWith('data:')) {
+        const base64 = updatedDoc.fileUrl.split(',')[1]
+        pdfBuffer = Buffer.from(base64, 'base64')
+      } else {
+        const pdfResponse = await fetch(updatedDoc.fileUrl)
+        pdfBuffer = Buffer.from(await pdfResponse.arrayBuffer())
+      }
 
       const signedSigners = updatedDoc.signers.filter(s => s.status === 'SIGNED')
       const signedPdfBytes = await embedSignaturesInPDF(
