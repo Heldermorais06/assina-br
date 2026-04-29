@@ -1,9 +1,14 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? 'Helder Morais'
 const FROM_EMAIL = `${APP_NAME} <onboarding@resend.dev>`
+
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  if (!key) throw new Error('RESEND_API_KEY não configurado.')
+  return new Resend(key)
+}
 
 export async function sendSignInvite({
   to,
@@ -25,7 +30,7 @@ export async function sendSignInvite({
     ? `Este link expira em ${new Date(expiresAt).toLocaleDateString('pt-BR')}.`
     : 'Este link não tem data de expiração definida.'
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: `${APP_NAME} - Você tem um documento para assinar: ${documentTitle}`,
@@ -75,7 +80,7 @@ export async function sendOTPEmail({
   signerName: string
   otp: string
 }) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: `Seu código de autenticação: ${otp}`,
@@ -125,7 +130,7 @@ export async function sendSignedConfirmation({
 }) {
   const dateStr = signedAt.toLocaleString('pt-BR', { timeZone: 'UTC' })
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: `Documento assinado com sucesso ✓ — ${documentTitle}`,
