@@ -2,7 +2,7 @@ import { Resend } from 'resend'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? 'Helder Morais'
-const FROM_EMAIL = `${APP_NAME} <onboarding@resend.dev>`
+const FROM_EMAIL = `${APP_NAME} <noreply@xn--heldermoraisimveis-31b.com.br>`
 
 function getResend() {
   const key = process.env.RESEND_API_KEY
