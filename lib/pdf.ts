@@ -94,7 +94,7 @@ export async function embedSignaturesInPDF(
 
     // Ícone de check
     sigPage.drawCircle({ x: 36, y: y - 20, size: 10, color: rgb(0.13, 0.77, 0.37) })
-    sigPage.drawText('✓', { x: 31, y: y - 24, size: 10, font: fontBold, color: rgb(1, 1, 1) })
+    sigPage.drawText('OK', { x: 28, y: y - 23, size: 7, font: fontBold, color: rgb(1, 1, 1) })
 
     sigPage.drawText(signer.name, { x: 52, y: y - 18, size: 10, font: fontBold, color: rgb(0.1, 0.1, 0.1) })
     sigPage.drawText(signer.email, { x: 52, y: y - 30, size: 8, font, color: rgb(0.4, 0.4, 0.4) })
