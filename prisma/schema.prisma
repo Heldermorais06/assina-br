@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  cpf       String?  @unique
+  phone     String?
+  password  String
+  createdAt DateTime @default(now())
+  documents Document[] @relation("DocumentOwner")
+  signers   Signer[]
+}
+
+model Document {
+  id         String    @id @default(cuid())
+  title      String
+  fileName   String
+  fileUrl    String
+  fileHash   String
+  signedUrl  String?
+  signedHash String?
+  status     String    @default("PENDING")
+  ownerId    String
+  owner      User      @relation("DocumentOwner", fields: [ownerId], references: [id])
+  signers    Signer[]
+  auditLogs  AuditLog[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  expiresAt  DateTime?
+  webhookUrl String?
+}
+
+model Signer {
+  id           String     @id @default(cuid())
+  documentId   String
+  document     Document   @relation(fields: [documentId], references: [id])
+  userId       String?
+  user         User?      @relation(fields: [userId], references: [id])
+  name         String
+  email        String
+  cpf          String?
+  signToken    String     @unique
+  signedAt     DateTime?
+  ipAddress    String?
+  userAgent    String?
+  geolocation  String?
+  signatureImg String?
+  authMethod   String     @default("EMAIL_TOKEN")
+  status       String     @default("PENDING")
+  order        Int        @default(0)
+  createdAt    DateTime   @default(now())
+  authTokens   AuthToken[]
+}
+
+model AuthToken {
+  id        String    @id @default(cuid())
+  signerId  String
+  signer    Signer    @relation(fields: [signerId], references: [id])
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+  createdAt DateTime  @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+  action     String
+  actorEmail String
+  actorIp    String
+  actorAgent String
+  metadata   String?
+  createdAt  DateTime @default(now())
+}
